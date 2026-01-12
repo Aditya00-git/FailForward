@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Micro-Failure Tracker</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+
+    <header>
+      <h1>Micro-Failure Tracker</h1>
+      <p>Turn small mistakes into better habits.</p>
+    </header>
+
+    <main class="layout">
+
+      <!-- LEFT PANEL -->
+      <section class="panel">
+
+        <div class="card">
+          <h2>Add Failure</h2>
+          <input id="title" placeholder="Title">
+          <input id="category" placeholder="Category">
+          <input id="reason" placeholder="Reason">
+          <input id="mood" placeholder="Mood">
+          <button onclick="addFailure()">Add Failure</button>
+        </div>
+
+        <div class="card">
+          <h2>Daily Reflection</h2>
+          <textarea id="reflectionText" placeholder="What did you learn today?" rows="4"></textarea>
+          <button onclick="addReflection()">Save Reflection</button>
+        </div>
+
+      </section>
+
+      <!-- RIGHT PANEL -->
+      <section class="panel">
+
+        <div class="card">
+          <h2>Search</h2>
+          <input id="searchInput" placeholder="Search failures">
+          <button id="searchBtn">Search</button>
+          <button id="clearBtn" class="secondary">Clear</button>
+
+        </div>
+
+        <div class="card">
+          <h2>Failures</h2>
+          <div id="failures"></div>
+        </div>
+
+        <div class="card">
+          <h2>Patterns</h2>
+          <p id="topCategory"></p>
+          <p id="topReason"></p>
+          <p id="topDay"></p>
+        </div>
+
+        <div class="card">
+          <h2>Report</h2>
+          <button onclick="exportReport()">Download Report</button>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+
+</html>
