@@ -1,17 +1,31 @@
+require("dotenv").config();
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const session = require("express-session");
+const user = require("./models/user");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("./models/user");
+const auth = require("./middleware/auth");
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-
+const mongoose = require("mongoose");
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-
-const failureFile = path.join(__dirname, "data/failures.json");
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch(err => console.log(err));
+const failureSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, 
+  title: String,
+  tags: [String],
+  reason: String,
+  mood: String,
+  date: String
+});
+const Failure = mongoose.model("Failure", failureSchema);
 const reflectionFile = path.join(__dirname, "data/reflections.json");
-
-app.use(express.json());
-app.use(express.static("public"));
-
 function readJSON(file) {
   try {
     return JSON.parse(fs.readFileSync(file, "utf-8"));
@@ -19,111 +33,93 @@ function readJSON(file) {
     return [];
   }
 }
-
 function writeJSON(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
-
-/* ---------- APIs ---------- */
-
-// Get all failures
-app.get("/api/failures", (req, res) => {
-  res.json(readJSON(failureFile));
+app.use(express.json());
+app.use(express.static("public"));
+app.use(session({ secret: "secret", resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
+app.get("/api/failures",auth, async (req, res) => {
+  const failures = await Failure.find({ user: req.userId });
+  res.json(failures);
 });
-
-// Add failure
-app.post("/api/failures", (req, res) => {
-  const data = readJSON(failureFile);
-  const newFailure = { ...req.body, date: new Date().toISOString() };
-  data.push(newFailure);
-  writeJSON(failureFile, data);
+app.post("/api/failures",auth, async (req, res) => {
+    await Failure.create({
+    ...req.body,
+    user: req.userId,   // ADD THIS
+    date: new Date().toISOString()
+  });
+app.delete("/api/failures/:id", auth, async (req, res) => {
+  await Failure.deleteOne({ _id: req.params.id, user: req.userId });
   res.json({ success: true });
 });
-
-// Get reflections
+app.put("/api/failures/:id", auth, async (req, res) => {
+  await Failure.updateOne(
+    { _id: req.params.id, user: req.userId },
+    req.body
+  );
+  res.json({ success: true });
+});
+  res.json({ success: true });
+});
 app.get("/api/reflections", (req, res) => {
   res.json(readJSON(reflectionFile));
 });
-
-// Add reflection
 app.post("/api/reflections", (req, res) => {
   const data = readJSON(reflectionFile);
   data.push({ ...req.body, date: new Date().toISOString() });
   writeJSON(reflectionFile, data);
   res.json({ success: true });
 });
-
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
-// Get pattern summary
-app.get("/api/patterns", (req, res) => {
-  const data = readJSON(failureFile);
-
-  if (data.length === 0) {
-    return res.json({});
+app.post("/api/register", async (req, res) => {
+  const { name, email, password } = req.body;
+  const hashed = await bcrypt.hash(password, 10);
+  await User.create({ name, email, password: hashed });
+  res.json({ success: true });
+});
+app.post("/api/login", async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(400).json({ message: "User not found" });
+  const ok = await bcrypt.compare(password, user.password);
+  if (!ok) return res.status(400).json({ message: "Wrong password" });
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+  res.json({ token });
+});
+app.get("/auth/google",
+  passport.authenticate("google", { scope:["profile","email"] })
+);
+app.get("/auth/google/callback",
+  passport.authenticate("google", { failureRedirect:"/login.html" }),
+  (req,res)=>{
+    const jwt = require("jsonwebtoken");
+    const token = jwt.sign({ id:req.user._id }, process.env.JWT_SECRET);
+    res.redirect(`/?token=${token}`);
   }
-
-  const categoryCount = {};
-  const reasonCount = {};
-  const dayCount = {};
-
-  data.forEach(item => {
-    categoryCount[item.category] =
-      (categoryCount[item.category] || 0) + 1;
-
-    reasonCount[item.reason] =
-      (reasonCount[item.reason] || 0) + 1;
-
-    const day = new Date(item.date).toLocaleDateString("en-US", {
-      weekday: "long"
+);
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "/auth/google/callback"
+},
+async (accessToken, refreshToken, profile, done) => {
+  let user = await User.findOne({ email: profile.emails[0].value });
+  if(!user){
+    user = await User.create({
+      name: profile.displayName,
+      email: profile.emails[0].value,
+      password: "google-auth"
     });
-    dayCount[day] = (dayCount[day] || 0) + 1;
-  });
-
-  function getTop(obj) {
-    let maxKey = null, maxVal = 0;
-    for (let k in obj) {
-      if (obj[k] > maxVal) {
-        maxVal = obj[k];
-        maxKey = k;
-      }
-    }
-    return maxKey;
   }
-
-  res.json({
-    topCategory: getTop(categoryCount),
-    topReason: getTop(reasonCount),
-    topDay: getTop(dayCount)
-  });
+  done(null, user);
+}));
+passport.serializeUser((user, done)=> done(null, user.id));
+passport.deserializeUser(async(id, done)=>{
+  const user = await User.findById(id);
+  done(null, user);
 });
-// Export report
-// Export report
-app.get("/api/export", (req, res) => {
-  const failures = readJSON(failureFile);
-  const reflections = readJSON(reflectionFile);
-
-  let content = "MICRO-FAILURE TRACKER REPORT\n";
-  content += "============================\n\n";
-
-  content += "FAILURES:\n";
-  failures.forEach((f, i) => {
-    content += `\n${i + 1}. ${f.title}\n`;
-    content += `   Category: ${f.category}\n`;
-    content += `   Reason: ${f.reason}\n`;
-    content += `   Mood: ${f.mood}\n`;
-    content += `   Date: ${f.date}\n`;
-  });
-
-  content += "\n\nREFLECTIONS:\n";
-  reflections.forEach((r, i) => {
-    content += `\n${i + 1}. ${new Date(r.date).toLocaleDateString()}\n`;
-    content += `   ${r.reflection}\n`;
-  });
-
-  res.setHeader("Content-Type", "text/plain");
-  res.setHeader("Content-Disposition", "attachment; filename=micro_failure_report.txt");
-  res.send(content);
-});
-
