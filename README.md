@@ -1,4 +1,4 @@
-MICRO-FAILURE TRACKER (FULL-STACK WEB APPLICATION) 
+FAILFORWARD
 ------------------------------------------------------------ 
 LIVE APPLICATION 
 ------------------------------------------------------------
@@ -6,7 +6,7 @@ https://failforward.onrender.com/
 ------------------------------------------------------------
 **PROJECT OVERVIEW**
 ------------------------------------------------------------
-FailForward (Micro-Failure Tracker) is a production-ready full-stack web
+FailForward is a production-ready full-stack web
 application built using JavaScript, Node.js, Express, and MongoDB.
 
 It helps users capture small daily failures, analyze behavioral patterns,
