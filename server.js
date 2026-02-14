@@ -12,6 +12,7 @@ const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3000;
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
