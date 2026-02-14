@@ -1,188 +1,255 @@
-MICRO-FAILURE TRACKER (FULL-STACK WEB APPLICATION)
+MICRO-FAILURE TRACKER (FULL-STACK WEB APPLICATION) 
+------------------------------------------------------------ 
+LIVE APPLICATION 
 ------------------------------------------------------------
-
-LIVE APPLICATION
+https://failforward.onrender.com/
 ------------------------------------------------------------
-https://micro-failure-webapp.onrender.com/
-
-PROJECT OVERVIEW
+**PROJECT OVERVIEW**
 ------------------------------------------------------------
-The Micro-Failure Tracker is a full-stack web application built using
-JavaScript, Node.js, and Express. It helps users capture small daily failures,
-analyze behavioral patterns, and reflect on lessons learned through a clean,
-minimal, and calm user interface.
+FailForward (Micro-Failure Tracker) is a production-ready full-stack web
+application built using JavaScript, Node.js, Express, and MongoDB.
 
-Instead of focusing only on success, this project encourages continuous
-self-improvement by tracking mistakes and learning from them in a practical,
-real-world way.
+It helps users capture small daily failures, analyze behavioral patterns,
+track streaks, visualize activity through charts and heatmaps, and build
+self-improvement habits using reflection and behavioral insights.
 
+Instead of focusing only on success, this application encourages continuous
+growth by tracking mistakes and learning from them in a practical,
+data-driven way.
 
-PROBLEM THIS PROJECT SOLVES
+The project evolved from a simple JSON-based tracker into a fully
+authenticated cloud-based productivity platform.
+
+------------------------------------------------------------
+**PROBLEM THIS PROJECT SOLVES**
 ------------------------------------------------------------
 People often repeat the same small mistakes:
-- Missing deadlines
-- Procrastinating
-- Avoiding difficult tasks
-- Poor time management
 
-These micro-failures slowly affect productivity and confidence, yet they are
-rarely tracked or analyzed.
+Missing deadlines
 
-This tool provides a simple system to:
-- Log failures
-- Review them
-- Discover patterns
-- Reflect on improvements
+Procrastinating
 
+Avoiding difficult tasks
 
-KEY FEATURES
+Poor time management
+
+Excessive phone usage
+
+Inconsistent reflection habits
+
+These micro-failures gradually reduce productivity and confidence,
+yet they are rarely tracked systematically.
+
+FailForward provides a structured system to:
+
+Log failures with multiple tags
+
+Discover behavior patterns
+
+Track streak consistency
+
+Visualize progress through charts and heatmaps
+
+Build awareness through daily reflection
+
 ------------------------------------------------------------
-- Add and store daily failures
-- View complete failure history
-- Search failures by keyword
-- Analyze behavioral patterns
-- Daily reflection system
-- Monthly performance insights
-- Export professional text report
-- Clean and minimal web interface
-- Fully deployed live application
-
-
-TECHNOLOGIES USED
+**KEY FEATURES**
 ------------------------------------------------------------
-Frontend
-- HTML
-- CSS
-- Vanilla JavaScript
+Secure user authentication (Email + Google OAuth)
 
-Backend
-- Node.js
-- Express.js
+Add and store daily failures
 
-Storage
-- JSON files (lightweight persistence)
+Multiple tag system (instead of single category)
 
-Deployment
-- Render (cloud hosting)
+View complete failure timeline
 
+Edit and delete failures
 
-PROJECT STRUCTURE
+Behavioral analytics dashboard
+
+Streak tracking system
+
+90-day GitHub-style activity heatmap
+
+AI-style behavior insights
+
+Dark / Light mode toggle
+
+Daily reminder notifications
+
+Installable PWA (Progressive Web App)
+
+Fully deployed cloud application
+
+------------------------------------------------------------
+**TECHNOLOGIES USED**
+------------------------------------------------------------
+-Frontend
+
+-HTML
+
+-CSS
+
+-Vanilla JavaScript
+
+-Chart.js
+
+-Backend
+
+-Node.js
+
+-Express.js
+
+-Database
+
+-MongoDB Atlas
+
+-Mongoose
+
+-Authentication
+
+-Passport.js
+
+-Google OAuth 2.0
+
+-JWT
+
+-Deployment
+
+-Render (Cloud Hosting)
+
+-PWA
+
+-Service Worker
+
+Web App Manifest
+
+------------------------------------------------------------
+**PROJECT STRUCTURE**
 ------------------------------------------------------------
 micro_failure_tracker_web/
+
 |
-|-- data/
-|   |-- failures.json
-|   |-- reflections.json
-|
+
 |-- public/
-|   |-- index.html
-|   |-- style.css
-|   |-- app.js
+
+| |-- index.html
+
+| |-- login.html
+
+| |-- style.css
+
+| |-- app.js
+
+| |-- manifest.json
+
+| |-- service-worker.js
+
 |
+
+|-- models/
+
+| |-- User.js
+
+| |-- Failure.js
+
+|
+
 |-- server.js
+
 |-- package.json
+
 |-- README.md
 
-
-HOW THE SYSTEM WORKS
 ------------------------------------------------------------
-1. User interacts with the web interface.
-2. Frontend sends requests to backend APIs.
-3. The server stores data in JSON files.
-4. Failures are permanently saved.
-5. Pattern analysis summarizes behavior.
-6. Reflections capture daily learning.
-7. Reports generate a complete activity summary.
-
-
-INSTALLATION
+**HOW THE SYSTEM WORKS**
 ------------------------------------------------------------
-1. Install Node.js from https://nodejs.org
-2. Clone or download this project.
-3. Open terminal inside the project folder.
-4. Install dependencies:
+-User logs in using email/password or Google OAuth.
 
-   npm install
+-Frontend sends authenticated requests using JWT tokens.
 
+-Backend APIs store data securely in MongoDB Atlas.
+
+-Failures are saved with tags and timestamps.
+
+-Dashboard generates statistics and charts.
+
+-Heatmap visualizes 90-day activity intensity.
+
+-Streak logic tracks daily consistency.
+
+Insights summarize behavioral patterns.
+
+------------------------------------------------------------
+**INSTALLATION**
+------------------------------------------------------------
+Install Node.js from https://nodejs.org
+
+Clone the repository
+
+Open terminal inside the project folder
+
+Install dependencies:
+
+npm install
 
 HOW TO RUN LOCALLY
-------------------------------------------------------------
+
 Start the application using:
 
-   npm start
+npm start
 
 Then open in browser:
 
-   http://localhost:3000
+http://localhost:3000
 
-
-DEPLOYMENT
+------------------------------------------------------------
+**DEPLOYMENT**
 ------------------------------------------------------------
 This project is deployed using Render.
 
-Note:
-On Render free hosting, the application may take
-20 to 60 seconds to load after inactivity because
-the server goes to sleep. This is normal behavior
-for free cloud hosting services.
-
-
-WEB APPLICATION FEATURES
 ------------------------------------------------------------
-- Add Failure Form
-- Search Bar
-- Failure List View
-- Pattern Summary Section
-- Daily Reflection Area
-- Report Download Button
-- Minimal and Calm UI Design
-
-
-OUTPUT FILES
+**USE CASES**
 ------------------------------------------------------------
-- failures.json              -> Stores all micro-failures
-- reflections.json           -> Stores daily reflections
-- micro_failure_report.txt   -> Generated summary report
+Students improving study habits
 
+Professionals tracking productivity patterns
 
-DESIGN PHILOSOPHY
+Habit building & self-discipline tracking
+
+Behavioral analytics experimentation
+
+Resume and portfolio showcase
+
+Interview-ready full-stack project
+
 ------------------------------------------------------------
-- Simplicity over complexity
-- Calm and distraction-free interface
-- Human-centered problem solving
-- Real-world usability
-- Readable and maintainable code
-- Product mindset, not just a demo
-
-
-USE CASES
+**FUTURE IMPROVEMENTS**
 ------------------------------------------------------------
-- Students improving study habits
-- Professionals tracking productivity issues
-- Personal growth and habit building
-- Behavioral pattern analysis
-- Resume and portfolio showcase
-- Interview project demonstration
+Custom reminder scheduling
 
+Advanced filtering & search
 
-FUTURE IMPROVEMENTS
+Weekly exportable PDF reports
+
+AI-powered behavioral recommendations
+
+Shared progress tracking
+
+Admin analytics dashboard
+
 ------------------------------------------------------------
-- User authentication
-- Cloud database integration
-- Data visualization dashboard
-- Mobile-friendly version
-- Dark mode / theme toggle
-
-
-CONCLUSION
+**CONCLUSION**
 ------------------------------------------------------------
-The Micro-Failure Tracker is a real-world full-stack project that demonstrates
-software engineering skills combined with human problem-solving.
+FailForward is a production-level full-stack application that combines
+software engineering with behavioral psychology.
 
-It goes beyond typical academic projects by addressing everyday behavioral
-challenges through clean design, practical logic, and real deployment.
+It demonstrates secure authentication, cloud database integration,
+data visualization, PWA implementation, and real-world deployment.
 
-
-AUTHOR
+The project reflects strong full-stack development skills along with
+a product-oriented mindset focused on practical user value.
+------------------------------------------------------------
+**AUTHOR**
 ------------------------------------------------------------
 Aditya Seswani
