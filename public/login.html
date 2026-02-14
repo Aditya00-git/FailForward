@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - FailForward</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      font-family: Arial, sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      padding: 40px;
+      border-radius: 16px;
+      width: 320px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      animation: fadeIn 0.8s ease forwards;
+      transform: translateY(20px);
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 14px;
+    }
+
+    input::placeholder {
+      color: #aaa;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: 0.3s ease;
+    }
+
+    .login-btn {
+      background: #22c55e;
+      color: black;
+    }
+
+    .login-btn:hover {
+      background: #16a34a;
+      transform: translateY(-2px);
+    }
+
+    .register-btn {
+      background: transparent;
+      border: 1px solid #22c55e;
+      color: #22c55e;
+    }
+
+    .register-btn:hover {
+      background: #22c55e;
+      color: black;
+      transform: translateY(-2px);
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #aaa;
+      margin-bottom: 25px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h2>FailForward</h2>
+    <div class="subtitle">Turn failures into growth.</div>
+
+    <div class="input-group">
+      <input id="email" placeholder="Email">
+    </div>
+
+    <div class="input-group">
+      <input id="password" type="password" placeholder="Password">
+    </div>
+    <button onclick="window.location='/auth/google'">
+        Continue with Google
+    </button>
+
+    <button class="login-btn" onclick="login()">Login</button>
+    <button class="register-btn" onclick="register()">Register</button>
+  </div>
+
+  <script>
+    async function register() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "User", email, password })
+      });
+
+      alert("Registered successfully. Now login.");
+    }
+
+    async function login() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      window.location.href = "/";
+    }
+  </script>
+
+</body>
+</html>
