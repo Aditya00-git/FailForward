@@ -1,74 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Micro-Failure Tracker</title>
+  <title>FailForward</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#22c55e">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="app">
-
-    <header>
-      <h1>Micro-Failure Tracker</h1>
-      <p>Turn small mistakes into better habits.</p>
-    </header>
-
-    <main class="layout">
-
-      <!-- LEFT PANEL -->
-      <section class="panel">
-
-        <div class="card">
-          <h2>Add Failure</h2>
-          <input id="title" placeholder="Title">
-          <input id="category" placeholder="Category">
-          <input id="reason" placeholder="Reason">
-          <input id="mood" placeholder="Mood">
-          <button onclick="addFailure()">Add Failure</button>
-        </div>
-
-        <div class="card">
-          <h2>Daily Reflection</h2>
-          <textarea id="reflectionText" placeholder="What did you learn today?" rows="4"></textarea>
-          <button onclick="addReflection()">Save Reflection</button>
-        </div>
-
-      </section>
-
-      <!-- RIGHT PANEL -->
-      <section class="panel">
-
-        <div class="card">
-          <h2>Search</h2>
-          <input id="searchInput" placeholder="Search failures">
-          <button id="searchBtn">Search</button>
-          <button id="clearBtn" class="secondary">Clear</button>
-
-        </div>
-
-        <div class="card">
-          <h2>Failures</h2>
-          <div id="failures"></div>
-        </div>
-
-        <div class="card">
-          <h2>Patterns</h2>
-          <p id="topCategory"></p>
-          <p id="topReason"></p>
-          <p id="topDay"></p>
-        </div>
-
-        <div class="card">
-          <h2>Report</h2>
-          <button onclick="exportReport()">Download Report</button>
-        </div>
-
-      </section>
-
-    </main>
+<div class="app">
+<header>
+  <h1>FailForward Dashboard</h1>
+  <div>
+    <button onclick="toggleTheme()">🌙</button>
+    <button onclick="logout()">Logout</button>
   </div>
-
-  <script src="app.js"></script>
+</header>
+<!-- Stats -->
+<div class="stats">
+  <div class="stat-card">
+    <h3 id="todayCount">0</h3>
+    <small>Today</small>
+  </div>
+  <div class="stat-card">
+    <h3 id="weekCount">0</h3>
+    <small>This Week</small>
+  </div>
+  <div class="stat-card">
+    <h3 id="topCategoryStat">-</h3>
+    <small>Top Category</small>
+  </div>
+  <div class="stat-card">
+    <h3 id="streakCount">0🔥</h3>
+    <small>Streak</small>
+  </div>
+</div>
+<div class="stats">
+  <div class="card">
+    <canvas id="dailyChart"></canvas>
+  </div>
+  <div class="card">
+    <canvas id="categoryChart"></canvas>
+  </div>
+</div>
+<main class="layout">
+<section class="panel">
+  <div class="card">
+    <h2>Add Failure</h2>
+    <input id="title" placeholder="Title">
+    <input id="tags" placeholder="Tags (comma separated)">
+    <input id="reason" placeholder="Reason">
+    <input id="mood" placeholder="Mood">
+    <button onclick="addFailure()">Add</button>
+  </div>
+  <div class="card">
+    <h2>Reflection</h2>
+    <textarea id="reflectionText"></textarea>
+    <button onclick="addReflection()">Save</button>
+  
+</section>
+<section class="panel">
+  <div class="card">
+    <h2>Failures Timeline</h2>
+    <div id="failures"></div>
+  </div>
+  <div class="card">
+    <h2>📅 Activity Heatmap</h2>
+    <div id="heatmap" class="heatmap"></div>
+  </div>
+  <div class="card">
+    <h2>🧠 Insights</h2>
+    <ul id="insightsList"></ul>
+  </div>
+</section>
+</main>
+</div>
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
 </body>
-
-
 </html>
