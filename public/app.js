@@ -38,26 +38,34 @@ async function loadFailures(){
 function displayFailures(data){
   const div=document.getElementById("failures");
   div.innerHTML="";
+
   data.forEach(f=>{
+
     div.innerHTML+=`
-      <div class="timeline-item">
+      <div class="timeline-item ${f.resolved ? "resolved" : ""}">
         <div class="dot"></div>
         <div class="content">
           <div class="row">
             <strong>${f.title}</strong>
             <span class="actions">
+              <button onclick="toggleResolve('${f._id}')">
+                ${f.resolved ? "Undo" : "Resolve"}
+              </button>
               <button onclick="editFailure('${f._id}')">✏️</button>
               <button onclick="deleteFailure('${f._id}')">🗑</button>
             </span>
           </div>
+
           ${f.tags.map(t=>`<span class="tag">${t}</span>`).join(" ")}
           <br>
+
           <small>${f.reason} • ${f.mood}</small>
           <small>${new Date(f.date).toLocaleString()}</small>
         </div>
       </div>`;
   });
 }
+
 function updateStats(data){
   const today=new Date().toDateString();
   const todayCount=data.filter(f=>new Date(f.date).toDateString()===today).length;
@@ -155,29 +163,62 @@ function generateInsights(data){
   });
 }
 async function deleteFailure(id){
-  if(!confirm("Delete this failure?")) return;
-  await fetch("/api/failures/"+id,{
+
+  const res = await fetch("/api/failures/"+id,{
     method:"DELETE",
-    headers:{Authorization:token}
+    headers:{
+      "Authorization": token
+    }
   });
-  showToast("Deleted ✓");
-  loadFailures();
+
+  if(res.ok){
+    showToast("Deleted ✓");
+    loadFailures();
+  } else {
+    showToast("Delete failed ❌");
+  }
 }
+
+async function toggleResolve(id){
+
+  const res = await fetch(`/api/failures/${id}/resolve`,{
+    method:"PATCH",
+    headers:{
+      "Authorization": token
+    }
+  });
+
+  if(res.ok){
+    showToast("Updated ✓");
+    loadFailures();
+  } else {
+    showToast("Error ❌");
+  }
+}
+
+
 async function editFailure(id){
+
   const title = prompt("New title:");
   if(!title) return;
-  await fetch("/api/failures/"+id,{
+
+  const res = await fetch("/api/failures/"+id,{
     method:"PUT",
     headers:{
       "Content-Type":"application/json",
-      Authorization:token
+      "Authorization": token
     },
     body: JSON.stringify({ title })
   });
 
-  showToast("Updated ✓");
-  loadFailures();
+  if(res.ok){
+    showToast("Updated ✓");
+    loadFailures();
+  } else {
+    showToast("Update failed ❌");
+  }
 }
+
 function calculateStreak(data){
   const dates = new Set(data.map(f=>new Date(f.date).toDateString()));
   let streak=0;
