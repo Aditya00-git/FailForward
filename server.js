@@ -12,7 +12,6 @@ const fs = require("fs");
 const path = require("path");
 const mongoose = require("mongoose");
 const app = express();
-app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3000;
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
@@ -126,4 +125,26 @@ passport.serializeUser((user, done)=> done(null, user.id));
 passport.deserializeUser(async(id, done)=>{
   const user = await User.findById(id);
   done(null, user);
+});
+app.patch("/api/failures/:id/resolve", auth, async (req, res) => {
+  try {
+    const failure = await Failure.findOne({
+      _id: req.params.id,
+      user: req.user.id
+    });
+
+    if (!failure) {
+      return res.status(404).json({ message: "Failure not found" });
+    }
+
+    failure.resolved = !failure.resolved;
+    failure.resolvedAt = failure.resolved ? new Date() : null;
+
+    await failure.save();
+
+    res.json({ success: true, resolved: failure.resolved });
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
 });
