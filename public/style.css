@@ -492,3 +492,40 @@ body.light .heat-day.level-4 { background:#16a34a; }
 body.light header {
   background: #ffffff;
 }
+.timeline-item.resolved {
+  opacity: 0.6;
+  border-left: 4px solid #22c55e;
+}
+.resolve-btn {
+  background: #22c55e;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  margin-top: 8px;
+}
+
+.failure-card.resolved {
+  opacity: 0.6;
+  border-left: 4px solid #22c55e;
+}
+.actions button {
+  background: #1f2937;
+  color: #fff;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.actions button:hover {
+  opacity: 0.8;
+}
+
+body.light .actions button {
+  background: #e5e7eb;
+  color: #111;
+}
