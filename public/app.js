@@ -101,6 +101,7 @@ async function addFailure(){
   clearInputs();
   showToast("Failure saved ✓");
   loadFailures();
+  loadUserStats();
 }
 function titleInput(id){
   return document.getElementById(id).value.trim();
@@ -283,5 +284,31 @@ function scheduleReminder(hour){
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/service-worker.js");
+  });
+}
+async function loadUserStats(){
+
+  const res = await fetch("/api/user-stats",{
+    headers:{ Authorization: token }
+  });
+
+  const data = await res.json();
+
+  document.getElementById("xp").innerText = data.xp;
+  document.getElementById("level").innerText = data.level;
+}
+async function loadBadges(){
+
+  const res = await fetch("/api/user-badges",{
+    headers:{ Authorization: token }
+  });
+
+  const data = await res.json();
+
+  const div = document.getElementById("badges");
+  div.innerHTML = "";
+
+  data.badges.forEach(b=>{
+    div.innerHTML += `<span class="badge">${b}</span>`;
   });
 }
