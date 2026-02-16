@@ -57,10 +57,12 @@
     <button onclick="addFailure()">Add</button>
   </div>
   <div class="card">
-    <h2>Reflection</h2>
-    <textarea id="reflectionText"></textarea>
-    <button onclick="addReflection()">Save</button>
-  </div>
+  <h3>📝 Daily Reflection</h3>
+  <textarea id="reflectionInput" placeholder="Write today's lesson..."></textarea>
+  <button onclick="addReflection()">Save Reflection</button>
+  <div id="reflectionList"></div>
+</div>
+
   <div class="card">
     <h3>🎮 Gamification</h3>
     <p>XP: <span id="xp">0</span></p>
