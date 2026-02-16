@@ -20,13 +20,22 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 const failureSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, 
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   title: String,
   tags: [String],
   reason: String,
   mood: String,
-  date: String
+  date: String,
+
+  resolved: {
+    type: Boolean,
+    default: false
+  },
+  resolvedAt: {
+    type: Date
+  }
 });
+
 const Failure = mongoose.model("Failure", failureSchema);
 const reflectionFile = path.join(__dirname, "data/reflections.json");
 function readJSON(file) {
@@ -48,16 +57,24 @@ app.get("/api/failures",auth, async (req, res) => {
   const failures = await Failure.find({ user: req.userId });
   res.json(failures);
 });
-app.post("/api/failures",auth, async (req, res) => {
-    await Failure.create({
+app.post("/api/failures", auth, async (req, res) => {
+  await Failure.create({
     ...req.body,
-    user: req.userId,   // ADD THIS
+    user: req.userId,
     date: new Date().toISOString()
   });
+  await User.updateOne(
+  { _id: req.userId },
+  { $inc: { xp: 5 } }
+);
+  res.json({ success: true });
+});
+
 app.delete("/api/failures/:id", auth, async (req, res) => {
   await Failure.deleteOne({ _id: req.params.id, user: req.userId });
   res.json({ success: true });
 });
+
 app.put("/api/failures/:id", auth, async (req, res) => {
   await Failure.updateOne(
     { _id: req.params.id, user: req.userId },
@@ -65,8 +82,7 @@ app.put("/api/failures/:id", auth, async (req, res) => {
   );
   res.json({ success: true });
 });
-  res.json({ success: true });
-});
+
 app.get("/api/reflections", (req, res) => {
   res.json(readJSON(reflectionFile));
 });
@@ -130,7 +146,7 @@ app.patch("/api/failures/:id/resolve", auth, async (req, res) => {
   try {
     const failure = await Failure.findOne({
       _id: req.params.id,
-      user: req.user.id
+      user: req.userId
     });
 
     if (!failure) {
@@ -139,12 +155,59 @@ app.patch("/api/failures/:id/resolve", auth, async (req, res) => {
 
     failure.resolved = !failure.resolved;
     failure.resolvedAt = failure.resolved ? new Date() : null;
-
     await failure.save();
+    if (failure.resolved) {
+    await User.updateOne(
+      { _id: req.userId },
+      { $inc: { xp: 10 } }
+    );
+  }
 
     res.json({ success: true, resolved: failure.resolved });
 
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
+});
+app.get("/api/user-stats", auth, async (req, res) => {
+
+  const user = await User.findById(req.userId);
+
+  const level = Math.floor(user.xp / 100) + 1;
+
+  res.json({
+    xp: user.xp,
+    level
+  });
+});
+app.get("/api/user-badges", auth, async (req, res) => {
+
+  const user = await User.findById(req.userId);
+  const failures = await Failure.find({ user: req.userId });
+  const reflections = await Reflection.find({ user: req.userId });
+
+  let badges = [];
+
+  // 30 Entries Badge
+  if (failures.length >= 30) {
+    badges.push("30 Entries");
+  }
+
+  // Reflection Master
+  if (reflections.length >= 20) {
+    badges.push("Reflection Master");
+  }
+
+  // 7 Day Streak
+  const dates = failures.map(f =>
+    new Date(f.date).toDateString()
+  );
+
+  const uniqueDates = [...new Set(dates)];
+
+  if (uniqueDates.length >= 7) {
+    badges.push("7 Day Streak");
+  }
+
+  res.json({ badges });
 });
