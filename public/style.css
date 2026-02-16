@@ -538,3 +538,37 @@ body.light .actions button {
   margin:5px;
   font-size:12px;
 }
+/* ===== XP POPUP ===== */
+
+#xp-popup-container{
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.xp-popup{
+  background: linear-gradient(45deg,#22c55e,#16a34a);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-top: 10px;
+  animation: floatUp 1.5s ease forwards;
+}
+
+@keyframes floatUp{
+  0%{
+    opacity:0;
+    transform:translateY(20px) scale(0.9);
+  }
+  30%{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
+  100%{
+    opacity:0;
+    transform:translateY(-30px) scale(1.05);
+  }
+}
