@@ -102,6 +102,8 @@ async function addFailure(){
   showToast("Failure saved ✓");
   loadFailures();
   loadUserStats();
+  showXP(5);
+  loadBadges();
 }
 function titleInput(id){
   return document.getElementById(id).value.trim();
@@ -190,12 +192,21 @@ async function toggleResolve(id){
   });
 
   if(res.ok){
+    const result = await res.json();
+
+    if(result.resolved){
+      showXP(10);
+    }
+
     showToast("Updated ✓");
     loadFailures();
+    loadUserStats();
+    loadBadges();
   } else {
     showToast("Error ❌");
   }
 }
+
 
 
 async function editFailure(id){
@@ -233,6 +244,7 @@ function calculateStreak(data){
 document.addEventListener("DOMContentLoaded",()=>{
   document.getElementById("title").focus();
   loadFailures();
+  loadBadges();
   initDailyReminder();
 });
 function renderHeatmap(data){
@@ -311,4 +323,18 @@ async function loadBadges(){
   data.badges.forEach(b=>{
     div.innerHTML += `<span class="badge">${b}</span>`;
   });
+}
+function showXP(amount){
+
+  const container = document.getElementById("xp-popup-container");
+
+  const popup = document.createElement("div");
+  popup.className = "xp-popup";
+  popup.innerText = `+${amount} XP`;
+
+  container.appendChild(popup);
+
+  setTimeout(()=>{
+    popup.remove();
+  },1500);
 }
