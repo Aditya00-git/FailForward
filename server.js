@@ -3,6 +3,7 @@ const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const session = require("express-session");
 const user = require("./models/user");
+const Reflection = require("./models/reflection");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("./models/user");
@@ -81,6 +82,28 @@ app.put("/api/failures/:id", auth, async (req, res) => {
     req.body
   );
   res.json({ success: true });
+});
+app.post("/api/reflections", auth, async (req, res) => {
+
+  await Reflection.create({
+    user: req.userId,
+    text: req.body.text
+  });
+
+  // XP for reflection
+  await User.updateOne(
+    { _id: req.userId },
+    { $inc: { xp: 8 } }
+  );
+
+  res.json({ success: true });
+});
+app.get("/api/reflections", auth, async (req, res) => {
+
+  const reflections = await Reflection.find({ user: req.userId })
+    .sort({ date: -1 });
+
+  res.json(reflections);
 });
 
 app.get("/api/reflections", (req, res) => {
@@ -184,7 +207,7 @@ app.get("/api/user-badges", auth, async (req, res) => {
 
   const user = await User.findById(req.userId);
   const failures = await Failure.find({ user: req.userId });
-  const reflections = await Reflection.find({ user: req.userId });
+  // const reflections = await Reflection.find({ user: req.userId });
 
   let badges = [];
 
@@ -194,9 +217,7 @@ app.get("/api/user-badges", auth, async (req, res) => {
   }
 
   // Reflection Master
-  if (reflections.length >= 20) {
-    badges.push("Reflection Master");
-  }
+  
 
   // 7 Day Streak
   const dates = failures.map(f =>
