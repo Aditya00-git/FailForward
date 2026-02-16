@@ -38,7 +38,7 @@ const failureSchema = new mongoose.Schema({
 });
 
 const Failure = mongoose.model("Failure", failureSchema);
-const reflectionFile = path.join(__dirname, "data/reflections.json");
+const ReflectionFile = path.join(__dirname, "data/reflections.json");
 function readJSON(file) {
   try {
     return JSON.parse(fs.readFileSync(file, "utf-8"));
@@ -123,19 +123,19 @@ app.post("/api/reflections", auth, async (req, res) => {
 });
 app.get("/api/reflections", auth, async (req, res) => {
 
-  const reflections = await Reflection.find({ user: req.userId })
+  const Reflections = await Reflection.find({ user: req.userId })
     .sort({ date: -1 });
 
-  res.json(reflections);
+  res.json(Reflections);
 });
 
 app.get("/api/reflections", (req, res) => {
-  res.json(readJSON(reflectionFile));
+  res.json(readJSON(ReflectionFile));
 });
 app.post("/api/reflections", (req, res) => {
-  const data = readJSON(reflectionFile);
+  const data = readJSON(ReflectionFile);
   data.push({ ...req.body, date: new Date().toISOString() });
-  writeJSON(reflectionFile, data);
+  writeJSON(ReflectionFile, data);
   res.json({ success: true });
 });
 app.listen(PORT, () => {
@@ -264,7 +264,7 @@ app.get("/api/user-badges", auth, async (req, res) => {
   }
 
   // 4. Reflection Master
-  if (reflections.length >= 20) {
+  if (Reflection.length >= 20) {
     badges.push("🧠 Reflection Master");
   }
 
@@ -292,12 +292,12 @@ app.get("/api/user-badges", auth, async (req, res) => {
 });
 app.delete("/api/reflections/:id", auth, async (req, res) => {
 
-  const reflection = await Reflection.findOne({
+  const Reflection = await Reflection.findOne({
     _id: req.params.id,
     user: req.userId
   });
 
-  if (!reflection) return res.status(404).json({ error: "Not found" });
+  if (!Reflection) return res.status(404).json({ error: "Not found" });
 
   // Remove XP
   await User.updateOne(
