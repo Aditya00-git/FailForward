@@ -245,6 +245,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.getElementById("title").focus();
   loadFailures();
   loadBadges();
+  loadUserStats();
+  loadReflections();  
   initDailyReminder();
 });
 function renderHeatmap(data){
@@ -337,4 +339,68 @@ function showXP(amount){
   setTimeout(()=>{
     popup.remove();
   },1500);
+}
+async function addReflection(){
+
+  const text = document.getElementById("reflectionInput").value;
+
+  if(!text) return;
+
+  const res = await fetch("/api/reflections",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization": token
+    },
+    body: JSON.stringify({ text })
+  });
+
+  if(res.ok){
+    showToast("Reflection stored ✓");
+    showXP(8);
+    document.getElementById("reflectionInput").value = "";
+    loadReflections();
+    loadUserStats();
+    loadBadges();
+  } else {
+    showToast("Error ❌");
+  }
+}
+async function loadReflections(){
+
+  const res = await fetch("/api/reflections",{
+    headers:{ Authorization: token }
+  });
+
+  const data = await res.json();
+
+  const container = document.getElementById("reflectionList");
+  if(!container) return;
+
+  container.innerHTML = "";
+
+  data.forEach(r=>{
+    container.innerHTML += `
+    <div class="reflection-item">
+      <p>${r.text}</p>
+      <small>${new Date(r.date).toLocaleString()}</small>
+      <button onclick="deleteReflection('${r._id}')">Delete</button>
+    </div>
+  `;
+  });
+}
+async function deleteReflection(id){
+
+  const res = await fetch(`/api/reflections/${id}`,{
+    method:"DELETE",
+    headers:{ Authorization: token }
+  });
+
+  if(res.ok){
+    showToast("Reflection removed");
+    showXP(-8);
+    loadReflections();
+    loadUserStats();
+    loadBadges();
+  }
 }
