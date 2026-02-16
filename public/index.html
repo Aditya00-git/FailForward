@@ -4,7 +4,8 @@
   <title>FailForward</title>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#22c55e">
-  <link rel="icon" type="image/jpeg" href="/icon-192.jpg">
+  <link rel="icon" type="image/x-png" href="/icon-192.png">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -59,6 +60,13 @@
     <h2>Reflection</h2>
     <textarea id="reflectionText"></textarea>
     <button onclick="addReflection()">Save</button>
+  </div>
+  <div class="card">
+    <h3>🎮 Gamification</h3>
+    <p>XP: <span id="xp">0</span></p>
+    <p>Level: <span id="level">1</span></p>
+    <div id="badges"></div>
+  </div>
   
 </section>
 <section class="panel">
@@ -74,6 +82,8 @@
     <h2>🧠 Insights</h2>
     <ul id="insightsList"></ul>
   </div>
+  
+
 </section>
 </main>
 </div>
