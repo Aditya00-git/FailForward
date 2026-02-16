@@ -72,9 +72,32 @@ app.post("/api/failures", auth, async (req, res) => {
 });
 
 app.delete("/api/failures/:id", auth, async (req, res) => {
-  await Failure.deleteOne({ _id: req.params.id, user: req.userId });
+
+  const failure = await Failure.findOne({
+    _id: req.params.id,
+    user: req.userId
+  });
+
+  if (!failure) return res.status(404).json({ error: "Not found" });
+
+  // Remove base XP
+  let xpToRemove = 5;
+
+  // If resolved, remove extra XP
+  if (failure.resolved) {
+    xpToRemove += 10;
+  }
+
+  await User.updateOne(
+    { _id: req.userId },
+    { $inc: { xp: -xpToRemove } }
+  );
+
+  await Failure.deleteOne({ _id: req.params.id });
+
   res.json({ success: true });
 });
+
 
 app.put("/api/failures/:id", auth, async (req, res) => {
   await Failure.updateOne(
@@ -177,14 +200,27 @@ app.patch("/api/failures/:id/resolve", auth, async (req, res) => {
     }
 
     failure.resolved = !failure.resolved;
-    failure.resolvedAt = failure.resolved ? new Date() : null;
-    await failure.save();
+
     if (failure.resolved) {
-    await User.updateOne(
-      { _id: req.userId },
-      { $inc: { xp: 10 } }
-    );
-  }
+      failure.resolvedAt = new Date();
+
+      await User.updateOne(
+        { _id: req.userId },
+        { $inc: { xp: 10 } }
+      );
+
+    } else {
+      failure.resolvedAt = null;
+
+      await User.updateOne(
+        { _id: req.userId },
+        { $inc: { xp: -10 } }
+      );
+    }
+
+    await failure.save();
+
+    res.json({ resolved: failure.resolved });
 
     res.json({ success: true, resolved: failure.resolved });
 
@@ -211,10 +247,32 @@ app.get("/api/user-badges", auth, async (req, res) => {
 
   let badges = [];
 
-  // 30 Entries Badge
-  if (failures.length >= 30) {
-    badges.push("30 Entries");
+// 1. Beginner
+  if (failures.length >= 5) {
+    badges.push("🔥 Getting Started");
   }
+
+  // 2. Consistent
+  if (failures.length >= 30) {
+    badges.push("🏆 30 Entries Club");
+  }
+
+  // 3. Resolver
+  const resolvedCount = failures.filter(f=>f.resolved).length;
+  if (resolvedCount >= 20) {
+    badges.push("✅ Problem Solver");
+  }
+
+  // 4. Reflection Master
+  if (reflections.length >= 20) {
+    badges.push("🧠 Reflection Master");
+  }
+
+  // 5. High Performer
+  if (user.xp >= 500) {
+    badges.push("🚀 High Performer");
+  }
+
 
   // Reflection Master
   
@@ -231,4 +289,23 @@ app.get("/api/user-badges", auth, async (req, res) => {
   }
 
   res.json({ badges });
+});
+app.delete("/api/reflections/:id", auth, async (req, res) => {
+
+  const reflection = await Reflection.findOne({
+    _id: req.params.id,
+    user: req.userId
+  });
+
+  if (!reflection) return res.status(404).json({ error: "Not found" });
+
+  // Remove XP
+  await User.updateOne(
+    { _id: req.userId },
+    { $inc: { xp: -8 } }
+  );
+
+  await Reflection.deleteOne({ _id: req.params.id });
+
+  res.json({ success: true });
 });
