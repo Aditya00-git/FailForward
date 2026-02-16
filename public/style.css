@@ -572,3 +572,14 @@ body.light .actions button {
     transform:translateY(-30px) scale(1.05);
   }
 }
+.reflection-item{
+  background:#1f2937;
+  padding:10px;
+  border-radius:8px;
+  margin-top:10px;
+}
+
+body.light .reflection-item{
+  background:#f3f4f6;
+}
+  
